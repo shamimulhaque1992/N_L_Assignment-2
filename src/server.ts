@@ -1,15 +1,13 @@
-import express from "express";
 import config from "./config";
+import { initDB } from "./db";
+import app from "./app";
 
-const app = express();
-const PORT = config.port;
+const main = () => {
+  // Initiate database
+  initDB();
+  app.listen(config.port, () => {
+    console.log(`Server running at port ${config.port}`);
+  });
+};
 
-app.get("/", (req, res) => {
-  res.send("Hello, Express World!");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-export default app;
+main();
