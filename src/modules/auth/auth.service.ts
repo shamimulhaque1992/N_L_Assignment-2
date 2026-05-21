@@ -34,20 +34,28 @@ const logIn = async (payload: LogInPayload) => {
     if (result.rows[0] === 0) {
       throw new Error("User not found");
     }
-    const userData = result.rows[0];
+    const {
+      id,
+      name,
+      email: responseEmail,
+      password: responsePassword,
+      role,
+      created_at,
+      updated_at,
+    } = result.rows[0];
 
     // check password matches or not
-    const passwordMatched = await bcrypt.compare(password, userData.password);
+    const passwordMatched = await bcrypt.compare(password, responsePassword);
     if (!passwordMatched) {
       throw new Error("Password is incorrect");
     }
 
     // generate jwt token
     const userPayload = {
-      id: userData.id,
-      name: userData.name,
-      email: userData.email,
-      role: userData.role,
+      id: id,
+      name: name,
+      email: responseEmail,
+      role: role,
     };
     const access_token = jwt.sign(
       userPayload,
@@ -59,7 +67,14 @@ const logIn = async (payload: LogInPayload) => {
       config.jwtRefreshSecret as string,
       { expiresIn: "1d" },
     );
-    return { access_token, refresh_token };
+
+    return {
+      access_token,
+      refresh_token,
+      ...userPayload,
+      created_at: created_at,
+      updated_at: updated_at,
+    };
   } catch (error) {
     throw new Error("Could not authenticate!");
   }
