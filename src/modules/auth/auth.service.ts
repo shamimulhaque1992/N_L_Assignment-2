@@ -1,6 +1,6 @@
 import { pool } from "../../db";
 import bcrypt from "bcryptjs";
-import { IUser } from "./auth.interface";
+import type { IUser } from "./auth.interface";
 
 const signUp = async (payload: IUser) => {
   const { name, email, password, role } = payload;
