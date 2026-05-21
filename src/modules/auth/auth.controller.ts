@@ -21,7 +21,24 @@ const signUp = async (req: Request, res: Response) => {
   }
 };
 
-const logIn = (req: Request, res: Response) => {};
+const logIn = async (req: Request, res: Response) => {
+  try {
+    const result = await authService.logIn(req.body);
+    sendResponse(res, {
+      status: 200,
+      success: true,
+      message: "User logged in successfully",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      status: 500,
+      success: false,
+      message: "User could not be logged in",
+      error: error,
+    });
+  }
+};
 const refreshToken = (req: Request, res: Response) => {};
 
 export const authController = {

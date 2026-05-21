@@ -20,7 +20,9 @@ const createIssue = async (req: Request, res: Response) => {
     });
   }
 };
-const getIssue = async (req: Request, res: Response) => {};
+const getIssue = async (req: Request, res: Response) => {
+  
+};
 const getIssues = async (req: Request, res: Response) => {};
 const updateIssue = async (req: Request, res: Response) => {};
 const deleteIssue = async (req: Request, res: Response) => {};

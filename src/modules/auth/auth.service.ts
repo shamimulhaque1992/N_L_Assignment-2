@@ -1,6 +1,13 @@
 import { pool } from "../../db";
 import bcrypt from "bcryptjs";
 import type { IUser } from "./auth.interface";
+import jwt from "jsonwebtoken";
+import config from "../../config";
+
+type LogInPayload = {
+  email: string;
+  password: string;
+};
 
 const signUp = async (payload: IUser) => {
   const { name, email, password, role } = payload;
@@ -17,7 +24,46 @@ const signUp = async (payload: IUser) => {
   }
 };
 
-const logIn = async (payload: IUser) => {};
+const logIn = async (payload: LogInPayload) => {
+  try {
+    // Check user exists or not
+    const { email, password } = payload;
+    const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
+    if (result.rows[0] === 0) {
+      throw new Error("User not found");
+    }
+    const userData = result.rows[0];
+
+    // check password matches or not
+    const passwordMatched = await bcrypt.compare(password, userData.password);
+    if (!passwordMatched) {
+      throw new Error("Password is incorrect");
+    }
+
+    // generate jwt token
+    const userPayload = {
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+    };
+    const access_token = jwt.sign(
+      userPayload,
+      config.jwtAccessSecret as string,
+      { expiresIn: "1d" },
+    );
+    const refresh_token = jwt.sign(
+      userPayload,
+      config.jwtRefreshSecret as string,
+      { expiresIn: "1d" },
+    );
+    return { access_token, refresh_token };
+  } catch (error) {
+    throw new Error("Could not authenticate!");
+  }
+};
 
 const refreshToken = async (payload: IUser) => {};
 
