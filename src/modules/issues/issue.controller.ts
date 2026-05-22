@@ -76,7 +76,7 @@ const updateIssue = async (req: Request, res: Response) => {
 };
 const deleteIssue = async (req: Request, res: Response) => {
   try {
-    const result = await issueService.deleteIssue(req.params.id as string);
+    await issueService.deleteIssue(req.params.id as string);
     sendResponse(res, {
       status: 200,
       success: true,
