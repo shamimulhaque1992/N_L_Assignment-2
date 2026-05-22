@@ -3,9 +3,11 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../db";
 import { Request } from "express";
 import { Issue, User } from "./issue.interface";
+import { validateIssueFields } from "./issue.helper";
 
 const createIssue = async (payload: Request) => {
   const { title, description, type, status }: Issue = payload.body;
+  validateIssueFields({ title, description, type, status }, true);
   const { authorization } = payload.headers;
   if (!authorization) {
     throw new Error("Unauthorized");
@@ -75,6 +77,7 @@ const updateIssue = async (payload: Request) => {
   const { id } = payload.params;
   const { authorization } = payload.headers;
   const { title, description, type, status }: Issue = payload.body;
+  validateIssueFields({ title, description, type, status });
 
   if (!authorization) {
     throw new Error("Unauthorized");
