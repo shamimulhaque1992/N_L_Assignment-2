@@ -40,7 +40,7 @@ const createIssue = async (payload: Request) => {
     throw new Error(error.message || "Issue could not be created");
   }
 };
-const getIssue = async (payload: any) => {
+const getIssue = async (payload: string) => {
   try {
     const result = await pool.query(`SELECT * FROM issues WHERE id=$1`, [
       payload,
@@ -140,7 +140,15 @@ const updateIssue = async (payload: Request) => {
     throw new Error(error.message || "Issue could not be updated");
   }
 };
-const deleteIssue = (payload: any) => {};
+const deleteIssue = async (payload: string) => {
+  const result = await pool.query(
+    `DELETE FROM issues WHERE id=$1 RETURNING *`,
+    [payload],
+  );
+  if (result.rows.length === 0) {
+    throw new Error("No issues found");
+  }
+};
 
 export const issueService = {
   createIssue,

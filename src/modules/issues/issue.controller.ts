@@ -22,7 +22,7 @@ const createIssue = async (req: Request, res: Response) => {
 };
 const getIssue = async (req: Request, res: Response) => {
   try {
-    const result = await issueService.getIssue(req.params.id);
+    const result = await issueService.getIssue(req.params.id as string);
     sendResponse(res, {
       status: 200,
       success: true,
@@ -74,7 +74,23 @@ const updateIssue = async (req: Request, res: Response) => {
     });
   }
 };
-const deleteIssue = async (req: Request, res: Response) => {};
+const deleteIssue = async (req: Request, res: Response) => {
+  try {
+    const result = await issueService.deleteIssue(req.params.id as string);
+    sendResponse(res, {
+      status: 200,
+      success: true,
+      message: "Issue deleted successfully",
+    });
+  } catch (error) {
+    sendResponse(res, {
+      status: 500,
+      success: false,
+      message: "Issue could not be deleted",
+      error: (error as Error).message,
+    });
+  }
+};
 
 export const issueController = {
   createIssue,
