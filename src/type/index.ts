@@ -1,6 +1,6 @@
-export type APP_ROLES = "admin" | "user" | "agent"
+export type APP_ROLES = "contributor" | "maintainer";
 
-const APP_ROLE = {
+export const APP_ROLE = {
   contributor: "contributor",
   maintainer: "maintainer",
 } as const;

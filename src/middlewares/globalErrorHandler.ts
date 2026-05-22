@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
+import { sendResponse } from "../utility/sendResponse";
 
 export const globalErrorHandler = (
   error: Error,
   req: Request,
   res: Response,
 ) => {
-  res.status(500).json({
+  sendResponse(res, {
     success: false,
-    message: error.message,
+    message: error.message || "Something went wrong",
+    status: 500,
+    error: error,
   });
 };

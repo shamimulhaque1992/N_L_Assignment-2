@@ -31,7 +31,7 @@ const logIn = async (payload: LogInPayload) => {
     const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
       email,
     ]);
-    if (result.rows[0] === 0) {
+    if (result.rows[0].length === 0) {
       throw new Error("User not found");
     }
     const {
@@ -65,15 +65,15 @@ const logIn = async (payload: LogInPayload) => {
     const refresh_token = jwt.sign(
       userPayload,
       config.jwtRefreshSecret as string,
-      { expiresIn: "1d" },
+      { expiresIn: "360d" },
     );
 
     return {
       access_token,
       refresh_token,
       ...userPayload,
-      created_at: created_at,
-      updated_at: updated_at,
+      created_at,
+      updated_at,
     };
   } catch (error) {
     throw new Error("Could not authenticate!");
