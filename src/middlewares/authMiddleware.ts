@@ -1,7 +1,8 @@
-import { APP_ROLES } from "../type";
+import type { APP_ROLES } from "../type";
 import { sendResponse } from "../utility/sendResponse";
 import config from "../config";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { pool } from "../db";
 import type { Request, Response, NextFunction } from "express";
 

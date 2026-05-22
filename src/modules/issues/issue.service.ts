@@ -1,9 +1,10 @@
 import config from "../../config";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../db";
-import { Request } from "express";
-import { Issue, User } from "./issue.interface";
+import type { Issue, User } from "./issue.interface";
 import { validateIssueFields } from "./issue.helper";
+import type { Request } from "express";
+import type { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const createIssue = async (payload: Request) => {
   const { title, description, type, status }: Issue = payload.body;

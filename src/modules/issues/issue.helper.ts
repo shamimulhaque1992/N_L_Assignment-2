@@ -1,4 +1,5 @@
-import { Issue } from "./issue.interface";
+import type { Issue } from "./issue.interface";
+
 
 const ISSUE_TYPE = {
   bug: "bug",
@@ -15,7 +16,7 @@ type IssueType = (typeof ISSUE_TYPE)[keyof typeof ISSUE_TYPE];
 type IssueStatus = (typeof ISSUE_STATUS)[keyof typeof ISSUE_STATUS];
 
 export const validateIssueFields = (
-  body: Partial<Issue>,
+  body: { [K in keyof Issue]?: Issue[K] | undefined },
   isCreate = false,
 ): void => {
   const { title, description, type, status } = body;
