@@ -42,9 +42,31 @@ const getIssue = async (payload: string) => {
   const formattedResult = { ...result.rows[0], reporter: userData.rows[0] };
   return formattedResult;
 };
-const getIssues = async () => {
-  const issues = (await pool.query(`SELECT * FROM issues`)).rows;
-  // Collect unique reporter ids
+const getIssues = async (query: Record<string, unknown> = {}) => {
+  const { sort = "newest", type, status } = query as Record<string, string>;
+
+  const conditions: string[] = [];
+  const params: string[] = [];
+
+  if (type) {
+    params.push(type);
+    conditions.push(`type = $${params.length}`);
+  }
+  if (status) {
+    params.push(status);
+    conditions.push(`status = $${params.length}`);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const order = sort === "oldest" ? "ASC" : "DESC";
+
+  const issues = (
+    await pool.query(
+      `SELECT * FROM issues ${where} ORDER BY created_at ${order}`,
+      params,
+    )
+  ).rows;
+
   const reporterIds: string[] = [];
   issues.forEach((issue) => {
     if (!reporterIds.includes(issue.reporter_id)) {

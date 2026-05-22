@@ -40,7 +40,7 @@ const getIssue = async (req: Request, res: Response) => {
 };
 const getIssues = async (req: Request, res: Response) => {
   try {
-    const result = await issueService.getIssues();
+    const result = await issueService.getIssues(req.query);
     sendResponse(res, {
       status: 200,
       success: true,
