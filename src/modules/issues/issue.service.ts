@@ -95,24 +95,50 @@ const getIssues = async () => {
     return issues;
   } catch (error) {}
 };
-const updateIssue = (payload: Request) => {
+const updateIssue = async (payload: Request) => {
   try {
     const { id } = payload.params;
     const { authorization } = payload.headers;
     const { title, description, type, status } = payload.body;
 
-    const decodedToken = jwt.verify(
-      authorization as string,
-      config.jwtAccessSecret as string,
-    ) as JwtPayload;
     if (!authorization) {
       throw new Error("Unauthorized");
     }
 
-    if(decodedToken.role==="contributor"){
-      
+    const decodedToken = jwt.verify(
+      authorization as string,
+      config.jwtAccessSecret as string,
+    ) as JwtPayload;
+
+    const issue = await pool.query(`SELECT * FROM issues WHERE id=$1`, [id]);
+    if (issue.rows.length === 0) {
+      throw new Error("No issues found");
     }
-  } catch (error) {}
+
+    const { status: currentStatus, reporter_id } = issue.rows[0];
+
+    if (decodedToken.role === "contributor") {
+      if (reporter_id !== decodedToken.id) {
+        throw new Error("Contributor can only update their own issues");
+      }
+      if (currentStatus !== "open") {
+        throw new Error("Contributor can only update open issues");
+      }
+      const result = await pool.query(
+        `UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type) WHERE id = $4 RETURNING *`,
+        [title, description, type, id],
+      );
+      return result.rows[0];
+    }
+
+    const result = await pool.query(
+      `UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type), status = COALESCE($4, status) WHERE id = $5 RETURNING *`,
+      [title, description, type, status, id],
+    );
+    return result.rows[0];
+  } catch (error: any) {
+    throw new Error(error.message || "Issue could not be updated");
+  }
 };
 const deleteIssue = (payload: any) => {};
 

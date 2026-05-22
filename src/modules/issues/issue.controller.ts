@@ -59,8 +59,19 @@ const getIssues = async (req: Request, res: Response) => {
 const updateIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.updateIssue(req);
+    sendResponse(res, {
+      status: 200,
+      success: true,
+      message: "Issue updated successfully",
+      data: result,
+    });
   } catch (error) {
-    
+    sendResponse(res, {
+      status: 500,
+      success: false,
+      message: "Issue could not be updated",
+      error: (error as Error).message,
+    });
   }
 };
 const deleteIssue = async (req: Request, res: Response) => {};
