@@ -1,10 +1,7 @@
-import config from "../../config";
 import { pool } from "../../db";
 import type { Issue, User } from "./issue.interface";
 import { validateIssueFields } from "./issue.helper";
 import type { Request } from "express";
-import type { JwtPayload } from "jsonwebtoken";
-import jwt from "jsonwebtoken";
 import { createError } from "../../utility/AppError";
 import { StatusCodes } from "http-status-codes";
 
@@ -12,19 +9,10 @@ import { StatusCodes } from "http-status-codes";
 const createIssue = async (payload: Request) => {
   const { title, description, type, status }: Issue = payload.body;
   validateIssueFields({ title, description, type, status }, true);
-  const { authorization } = payload.headers;
-  if (!authorization) {
-    throw createError(StatusCodes.UNAUTHORIZED, "Unauthorized");
-  }
-
-  const decodedToken = jwt.verify(
-    authorization as string,
-    config.jwtAccessSecret as string,
-  ) as JwtPayload;
 
   const result = await pool.query(
     `INSERT INTO issues(title, description, type,status, reporter_id) VALUES($1, $2, $3, COALESCE($4, 'open'), $5) RETURNING *`,
-    [title, description, type, status, decodedToken.id],
+    [title, description, type, status, payload.user?.id],
   );
   return result.rows[0];
 };
@@ -107,18 +95,8 @@ const getIssues = async (query: Record<string, unknown> = {}) => {
 // update issue
 const updateIssue = async (payload: Request) => {
   const { id } = payload.params;
-  const { authorization } = payload.headers;
   const { title, description, type, status }: Issue = payload.body;
   validateIssueFields({ title, description, type, status });
-
-  if (!authorization) {
-    throw createError(StatusCodes.UNAUTHORIZED, "Unauthorized");
-  }
-
-  const decodedToken = jwt.verify(
-    authorization as string,
-    config.jwtAccessSecret as string,
-  ) as JwtPayload;
 
   const issue = await pool.query(`SELECT * FROM issues WHERE id=$1`, [id]);
   if (issue.rows.length === 0) {
@@ -127,8 +105,8 @@ const updateIssue = async (payload: Request) => {
 
   const { status: currentStatus, reporter_id } = issue.rows[0];
 
-  if (decodedToken.role === "contributor") {
-    if (reporter_id !== decodedToken.id) {
+  if (payload.user?.role === "contributor") {
+    if (reporter_id !== payload.user?.id) {
       throw createError(
         StatusCodes.FORBIDDEN,
         "Contributor can only update their own issues",
