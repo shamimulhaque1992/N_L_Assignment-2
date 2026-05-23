@@ -10,17 +10,9 @@ router.post(
   authMiddleware(APP_ROLE.maintainer, APP_ROLE.contributor),
   issueController.createIssue,
 );
-router.get(
-  "/:id",
-  authMiddleware(APP_ROLE.maintainer, APP_ROLE.contributor),
-  issueController.getIssue,
-);
-router.get(
-  "/",
-  authMiddleware(APP_ROLE.maintainer, APP_ROLE.contributor),
-  issueController.getIssues,
-);
-router.put(
+router.get("/:id", issueController.getIssue);
+router.get("/", issueController.getIssues);
+router.patch(
   "/:id",
   authMiddleware(APP_ROLE.maintainer, APP_ROLE.contributor),
   issueController.updateIssue,

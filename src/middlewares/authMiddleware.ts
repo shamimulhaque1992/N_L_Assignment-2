@@ -46,11 +46,7 @@ export const authMiddleware = (...roles: APP_ROLES[]) => {
       req.user = decodedToken;
       next();
     } catch (error) {
-      sendResponse(res, {
-        success: false,
-        message: "Unauthorized",
-        status: StatusCodes.UNAUTHORIZED,
-      });
+      next(error);
     }
   };
 };
