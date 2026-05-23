@@ -19,7 +19,7 @@ const signUp = async (req: Request, res: Response) => {
       status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Could not create user",
-      error: (error as Error).message,
+      errors: (error as Error).message,
     });
   }
 };
@@ -47,7 +47,7 @@ const logIn = async (req: Request, res: Response) => {
       status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Login failed",
-      error: (error as Error).message,
+      errors: (error as Error).message,
     });
   }
 };
