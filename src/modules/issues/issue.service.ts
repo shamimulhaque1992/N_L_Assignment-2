@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { createError } from "../../utility/AppError";
 import { StatusCodes } from "http-status-codes";
 
+// create a new issue
 const createIssue = async (payload: Request) => {
   const { title, description, type, status }: Issue = payload.body;
   validateIssueFields({ title, description, type, status }, true);
@@ -27,6 +28,8 @@ const createIssue = async (payload: Request) => {
   );
   return result.rows[0];
 };
+
+// get a single issue by id
 const getIssue = async (payload: string) => {
   const result = await pool.query(`SELECT * FROM issues WHERE id=$1`, [
     payload,
@@ -44,6 +47,8 @@ const getIssue = async (payload: string) => {
   const formattedResult = { ...result.rows[0], reporter: userData.rows[0] };
   return formattedResult;
 };
+
+// get all issues
 const getIssues = async (query: Record<string, unknown> = {}) => {
   const { sort = "newest", type, status } = query as Record<string, string>;
 
@@ -98,6 +103,8 @@ const getIssues = async (query: Record<string, unknown> = {}) => {
 
   return issues;
 };
+
+// update issue
 const updateIssue = async (payload: Request) => {
   const { id } = payload.params;
   const { authorization } = payload.headers;
@@ -122,10 +129,16 @@ const updateIssue = async (payload: Request) => {
 
   if (decodedToken.role === "contributor") {
     if (reporter_id !== decodedToken.id) {
-      throw createError(StatusCodes.FORBIDDEN, "Contributor can only update their own issues");
+      throw createError(
+        StatusCodes.FORBIDDEN,
+        "Contributor can only update their own issues",
+      );
     }
     if (currentStatus !== "open") {
-      throw createError(StatusCodes.CONFLICT, "Contributor can only update open issues");
+      throw createError(
+        StatusCodes.CONFLICT,
+        "Contributor can only update open issues",
+      );
     }
     const result = await pool.query(
       `UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type) WHERE id = $4 RETURNING *`,
@@ -140,6 +153,8 @@ const updateIssue = async (payload: Request) => {
   );
   return result.rows[0];
 };
+
+// delete issue
 const deleteIssue = async (payload: string) => {
   const result = await pool.query(
     `DELETE FROM issues WHERE id=$1 RETURNING *`,

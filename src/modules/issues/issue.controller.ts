@@ -3,6 +3,7 @@ import { sendResponse } from "../../utility/sendResponse";
 import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
+// create a new issue
 const createIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.createIssue(req);
@@ -21,6 +22,8 @@ const createIssue = async (req: Request, res: Response) => {
     });
   }
 };
+
+// get a single issue by id
 const getIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.getIssue(req.params.id as string);
@@ -39,6 +42,8 @@ const getIssue = async (req: Request, res: Response) => {
     });
   }
 };
+
+// get all issues
 const getIssues = async (req: Request, res: Response) => {
   try {
     const result = await issueService.getIssues(req.query);
@@ -57,6 +62,8 @@ const getIssues = async (req: Request, res: Response) => {
     });
   }
 };
+
+// update issue
 const updateIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.updateIssue(req);
@@ -75,6 +82,8 @@ const updateIssue = async (req: Request, res: Response) => {
     });
   }
 };
+
+// delete issue
 const deleteIssue = async (req: Request, res: Response) => {
   try {
     await issueService.deleteIssue(req.params.id as string);

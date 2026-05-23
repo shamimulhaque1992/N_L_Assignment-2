@@ -5,6 +5,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { pool } from "../db";
 import type { Request, Response, NextFunction } from "express";
+import { StatusCodes } from "http-status-codes";
 
 export const authMiddleware = (...roles: APP_ROLES[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,7 @@ export const authMiddleware = (...roles: APP_ROLES[]) => {
         return sendResponse(res, {
           success: false,
           message: "Unauthorized",
-          status: 401,
+          status: StatusCodes.UNAUTHORIZED,
         });
       }
 
@@ -31,7 +32,7 @@ export const authMiddleware = (...roles: APP_ROLES[]) => {
         return sendResponse(res, {
           success: false,
           message: "User not found",
-          status: 401,
+          status: StatusCodes.UNAUTHORIZED,
         });
       }
 
@@ -39,7 +40,7 @@ export const authMiddleware = (...roles: APP_ROLES[]) => {
         return sendResponse(res, {
           success: false,
           message: "Forbidden",
-          status: 403,
+          status: StatusCodes.FORBIDDEN,
         });
       }
       req.user = decodedToken;
@@ -48,7 +49,7 @@ export const authMiddleware = (...roles: APP_ROLES[]) => {
       sendResponse(res, {
         success: false,
         message: "Unauthorized",
-        status: 401,
+        status: StatusCodes.UNAUTHORIZED,
       });
     }
   };
