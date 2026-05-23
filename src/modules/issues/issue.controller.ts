@@ -14,7 +14,7 @@ const createIssue = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issue could not be created",
       error: (error as Error).message,
@@ -32,7 +32,7 @@ const getIssue = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issue could not be retrieved",
       error: (error as Error).message,
@@ -50,7 +50,7 @@ const getIssues = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issues could not be retrieved",
       error: (error as Error).message,
@@ -68,7 +68,7 @@ const updateIssue = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issue could not be updated",
       error: (error as Error).message,
@@ -85,7 +85,7 @@ const deleteIssue = async (req: Request, res: Response) => {
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issue could not be deleted",
       error: (error as Error).message,

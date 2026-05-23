@@ -11,14 +11,14 @@ const signUp = async (req: Request, res: Response) => {
     sendResponse(res, {
       status: StatusCodes.CREATED,
       success: true,
-      message: "User create successfully",
+      message: "User registered successfully",
       data: result,
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
-      message: "User could not be created",
+      message: "Could not create user",
       error: (error as Error).message,
     });
   }
@@ -39,14 +39,14 @@ const logIn = async (req: Request, res: Response) => {
     sendResponse(res, {
       status: StatusCodes.OK,
       success: true,
-      message: "User logged in successfully",
+      message: "Login successful",
       data: response,
     });
   } catch (error) {
     sendResponse(res, {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      status: (error as any).statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
-      message: "User could not be logged in",
+      message: "Login failed",
       error: (error as Error).message,
     });
   }

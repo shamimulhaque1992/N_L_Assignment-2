@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import type { IUser } from "./auth.interface";
 import jwt from "jsonwebtoken";
 import config from "../../config";
+import { createError } from "../../utility/AppError";
+import { StatusCodes } from "http-status-codes";
 
 type LogInPayload = {
   email: string;
@@ -20,7 +22,7 @@ const signUp = async (payload: IUser) => {
     delete result.rows[0].password;
     return result.rows[0];
   } catch (error) {
-    throw new Error("Could not create user");
+    throw createError(StatusCodes.BAD_REQUEST, (error as Error).message);
   }
 };
 
@@ -30,7 +32,7 @@ const logIn = async (payload: LogInPayload) => {
     email,
   ]);
   if (result.rows.length === 0) {
-    throw new Error("User not found");
+    throw createError(StatusCodes.NOT_FOUND, "User not found");
   }
   const {
     id,
@@ -45,7 +47,7 @@ const logIn = async (payload: LogInPayload) => {
   // check password matches or not
   const passwordMatched = await bcrypt.compare(password, responsePassword);
   if (!passwordMatched) {
-    throw new Error("Password is incorrect");
+    throw createError(StatusCodes.UNAUTHORIZED, "Password is incorrect");
   }
 
   // generate jwt token

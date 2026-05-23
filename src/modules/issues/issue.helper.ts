@@ -1,3 +1,6 @@
+import { createError } from "../../utility/AppError";
+import { StatusCodes } from "http-status-codes";
+
 const ISSUE_TYPES = ["bug", "feature_request"];
 const ISSUE_STATUSES = ["open", "in_progress", "resolved"];
 
@@ -15,23 +18,23 @@ export const validateIssueFields = (
   const { title, description, type, status } = body;
 
   if (isCreate || title !== undefined) {
-    if (!title) throw new Error("Title is required");
+    if (!title) throw createError(StatusCodes.BAD_REQUEST, "Title is required");
     if (title.length > 150)
-      throw new Error("Title must be at most 150 characters");
+      throw createError(StatusCodes.BAD_REQUEST, "Title must be at most 150 characters");
   }
 
   if (isCreate || description !== undefined) {
-    if (!description) throw new Error("Description is required");
+    if (!description) throw createError(StatusCodes.BAD_REQUEST, "Description is required");
     if (description.length < 20)
-      throw new Error("Description must be at least 20 characters");
+      throw createError(StatusCodes.BAD_REQUEST, "Description must be at least 20 characters");
   }
 
   if (isCreate || type !== undefined) {
-    if (!type) throw new Error("Type is required");
+    if (!type) throw createError(StatusCodes.BAD_REQUEST, "Type is required");
     if (!ISSUE_TYPES.includes(type))
-      throw new Error("Type must be either bug or feature_request");
+      throw createError(StatusCodes.BAD_REQUEST, "Type must be either bug or feature_request");
   }
 
   if (status !== undefined && !ISSUE_STATUSES.includes(status))
-    throw new Error("Status must be one of: open, in_progress, resolved");
+    throw createError(StatusCodes.BAD_REQUEST, "Status must be one of: open, in_progress, resolved");
 };

@@ -5,13 +5,15 @@ import { validateIssueFields } from "./issue.helper";
 import type { Request } from "express";
 import type { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
+import { createError } from "../../utility/AppError";
+import { StatusCodes } from "http-status-codes";
 
 const createIssue = async (payload: Request) => {
   const { title, description, type, status }: Issue = payload.body;
   validateIssueFields({ title, description, type, status }, true);
   const { authorization } = payload.headers;
   if (!authorization) {
-    throw new Error("Unauthorized");
+    throw createError(StatusCodes.UNAUTHORIZED, "Unauthorized");
   }
 
   const decodedToken = jwt.verify(
@@ -30,7 +32,7 @@ const getIssue = async (payload: string) => {
     payload,
   ]);
   if (result.rows.length === 0) {
-    throw new Error("No issues found");
+    throw createError(StatusCodes.NOT_FOUND, "Issue not found");
   }
 
   const { reporter_id } = result.rows[0];
@@ -103,7 +105,7 @@ const updateIssue = async (payload: Request) => {
   validateIssueFields({ title, description, type, status });
 
   if (!authorization) {
-    throw new Error("Unauthorized");
+    throw createError(StatusCodes.UNAUTHORIZED, "Unauthorized");
   }
 
   const decodedToken = jwt.verify(
@@ -113,17 +115,17 @@ const updateIssue = async (payload: Request) => {
 
   const issue = await pool.query(`SELECT * FROM issues WHERE id=$1`, [id]);
   if (issue.rows.length === 0) {
-    throw new Error("No issues found");
+    throw createError(StatusCodes.NOT_FOUND, "Issue not found");
   }
 
   const { status: currentStatus, reporter_id } = issue.rows[0];
 
   if (decodedToken.role === "contributor") {
     if (reporter_id !== decodedToken.id) {
-      throw new Error("Contributor can only update their own issues");
+      throw createError(StatusCodes.FORBIDDEN, "Contributor can only update their own issues");
     }
     if (currentStatus !== "open") {
-      throw new Error("Contributor can only update open issues");
+      throw createError(StatusCodes.CONFLICT, "Contributor can only update open issues");
     }
     const result = await pool.query(
       `UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type) WHERE id = $4 RETURNING *`,
@@ -144,7 +146,7 @@ const deleteIssue = async (payload: string) => {
     [payload],
   );
   if (result.rows.length === 0) {
-    throw new Error("No issues found");
+    throw createError(StatusCodes.NOT_FOUND, "Issue not found");
   }
 };
 
