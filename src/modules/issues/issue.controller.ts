@@ -17,7 +17,7 @@ const createIssue = async (req: Request, res: Response) => {
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "Issue could not be created",
-      error: error,
+      error: (error as Error).message,
     });
   }
 };

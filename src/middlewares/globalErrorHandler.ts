@@ -10,6 +10,6 @@ export const globalErrorHandler = (
     success: false,
     message: error.message || "Something went wrong",
     status: 500,
-    error: error,
+    error: { message: error.message, stack: error.stack },
   });
 };
