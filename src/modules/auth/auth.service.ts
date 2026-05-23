@@ -25,59 +25,52 @@ const signUp = async (payload: IUser) => {
 };
 
 const logIn = async (payload: LogInPayload) => {
-  try {
-    // Check user exists or not
-    const { email, password } = payload;
-    const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
-      email,
-    ]);
-    if (result.rows[0].length === 0) {
-      throw new Error("User not found");
-    }
-    const {
-      id,
-      name,
-      email: responseEmail,
-      password: responsePassword,
-      role,
-      created_at,
-      updated_at,
-    } = result.rows[0];
-
-    // check password matches or not
-    const passwordMatched = await bcrypt.compare(password, responsePassword);
-    if (!passwordMatched) {
-      throw new Error("Password is incorrect");
-    }
-
-    // generate jwt token
-    const userPayload = {
-      id: id,
-      name: name,
-      email: responseEmail,
-      role: role,
-    };
-    const access_token = jwt.sign(
-      userPayload,
-      config.jwtAccessSecret as string,
-      { expiresIn: "1d" },
-    );
-    const refresh_token = jwt.sign(
-      userPayload,
-      config.jwtRefreshSecret as string,
-      { expiresIn: "360d" },
-    );
-
-    return {
-      access_token,
-      refresh_token,
-      ...userPayload,
-      created_at,
-      updated_at,
-    };
-  } catch (error) {
-    throw new Error("Could not authenticate!");
+  const { email, password } = payload;
+  const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
+  if (result.rows.length === 0) {
+    throw new Error("User not found");
   }
+  const {
+    id,
+    name,
+    email: responseEmail,
+    password: responsePassword,
+    role,
+    created_at,
+    updated_at,
+  } = result.rows[0];
+
+  // check password matches or not
+  const passwordMatched = await bcrypt.compare(password, responsePassword);
+  if (!passwordMatched) {
+    throw new Error("Password is incorrect");
+  }
+
+  // generate jwt token
+  const userPayload = {
+    id: id,
+    name: name,
+    email: responseEmail,
+    role: role,
+  };
+  const access_token = jwt.sign(userPayload, config.jwtAccessSecret as string, {
+    expiresIn: "1d",
+  });
+  const refresh_token = jwt.sign(
+    userPayload,
+    config.jwtRefreshSecret as string,
+    { expiresIn: "360d" },
+  );
+
+  return {
+    access_token,
+    refresh_token,
+    ...userPayload,
+    created_at,
+    updated_at,
+  };
 };
 
 const refreshToken = async (payload: IUser) => {};

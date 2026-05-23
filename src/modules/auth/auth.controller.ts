@@ -3,19 +3,20 @@ import { sendResponse } from "../../utility/sendResponse";
 import { authService } from "./auth.service";
 import { prepareAuthSuccessResponse } from "./auth.helper";
 import config from "../../config";
+import { StatusCodes } from "http-status-codes";
 
 const signUp = async (req: Request, res: Response) => {
   try {
     const result = await authService.signUp(req.body);
     sendResponse(res, {
-      status: 201,
+      status: StatusCodes.CREATED,
       success: true,
       message: "User create successfully",
       data: result,
     });
   } catch (error) {
     sendResponse(res, {
-      status: 500,
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "User could not be created",
       error: error,
@@ -36,14 +37,14 @@ const logIn = async (req: Request, res: Response) => {
 
     const response = prepareAuthSuccessResponse(result);
     sendResponse(res, {
-      status: 200,
+      status: StatusCodes.OK,
       success: true,
       message: "User logged in successfully",
       data: response,
     });
   } catch (error) {
     sendResponse(res, {
-      status: 500,
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
       success: false,
       message: "User could not be logged in",
       error: error,
