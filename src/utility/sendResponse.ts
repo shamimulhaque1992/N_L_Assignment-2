@@ -12,7 +12,7 @@ export const sendResponse = <T>(res: Response, data: TResponse<T>) => {
   return res.status(data.status).json({
     success: data.success,
     message: data.message,
-    data: data.data,
-    errors: data.errors,
+    ...(data.data !== undefined ? { data: data.data } : {}),
+    ...(data.errors !== undefined ? { errors: data.errors } : {}),
   });
 };

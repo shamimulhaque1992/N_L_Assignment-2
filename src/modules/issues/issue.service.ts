@@ -71,10 +71,9 @@ const getIssues = async (query: Record<string, unknown> = {}) => {
 
   // Fetch reporters
   const users = (
-    await pool.query(
-      `SELECT id, name, email, role FROM users WHERE id = ANY($1)`,
-      [reporterIds],
-    )
+    await pool.query(`SELECT id, name, role FROM users WHERE id = ANY($1)`, [
+      reporterIds,
+    ])
   ).rows;
 
   // Build lookup object
@@ -106,7 +105,7 @@ const updateIssue = async (payload: Request) => {
   const { status: currentStatus, reporter_id } = issue.rows[0];
 
   if (payload.user?.role === "contributor") {
-    if (reporter_id !== payload.user?.id) {
+    if (Number(reporter_id) !== Number(payload.user?.id)) {
       throw createError(
         StatusCodes.FORBIDDEN,
         "Contributor can only update their own issues",

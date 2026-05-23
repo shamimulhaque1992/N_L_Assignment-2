@@ -27,13 +27,6 @@ const signUp = async (req: Request, res: Response) => {
 const logIn = async (req: Request, res: Response) => {
   try {
     const result = await authService.logIn(req.body);
-    const { refresh_token } = result || {};
-
-    res.cookie("refresh_token", refresh_token, {
-      secure: config.env === "production",
-      httpOnly: true,
-      sameSite: "lax",
-    });
 
     const response = prepareAuthSuccessResponse(result);
     sendResponse(res, {

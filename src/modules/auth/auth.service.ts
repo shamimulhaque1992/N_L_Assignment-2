@@ -62,25 +62,16 @@ const logIn = async (payload: LogInPayload) => {
   const access_token = jwt.sign(userPayload, config.jwtAccessSecret as string, {
     expiresIn: "1d",
   });
-  const refresh_token = jwt.sign(
-    userPayload,
-    config.jwtRefreshSecret as string,
-    { expiresIn: "360d" },
-  );
 
   return {
     access_token,
-    refresh_token,
     ...userPayload,
     created_at,
     updated_at,
   };
 };
 
-const refreshToken = async (payload: IUser) => {};
-
 export const authService = {
   signUp,
   logIn,
-  refreshToken,
 };
