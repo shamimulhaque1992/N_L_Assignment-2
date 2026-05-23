@@ -83,12 +83,12 @@ const getIssues = async (query: Record<string, unknown> = {}) => {
   });
 
   // Inject reporter into each issue
-  issues.forEach((issue) => {
-    issue.reporter = usersById[issue.reporter_id];
-    delete issue.reporter_id;
-  });
-
-  return issues;
+  return issues.map(({ reporter_id, created_at, updated_at, ...rest }) => ({
+    ...rest,
+    reporter: usersById[reporter_id],
+    created_at,
+    updated_at,
+  }));
 };
 
 // update issue
