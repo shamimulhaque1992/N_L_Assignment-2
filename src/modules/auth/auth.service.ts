@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import config from "../../config";
 import { createError } from "../../utility/AppError";
 import { StatusCodes } from "http-status-codes";
+import { validateSignUpFields } from "./auth.helper";
 
 type LogInPayload = {
   email: string;
@@ -12,7 +13,8 @@ type LogInPayload = {
 };
 
 const signUp = async (payload: IUser) => {
-  const { name, email, password, role } = payload;
+  const { name, email, password, role }: IUser = payload;
+  validateSignUpFields({ name, email, password, ...(role && { role }) });
   const hasPassword = await bcrypt.hash(password, 10);
   try {
     const result = await pool.query(
